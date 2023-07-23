@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
+from api.v1.base.utils.filters import CreatedRangeFilter
 from api.v1.student import serializers
 from senat.models import Student, University
 
@@ -13,6 +14,7 @@ class StudentListCreateView(generics.ListCreateAPIView):
     queryset = Student.objects.all()
     serializer_class = serializers.StudentSerializer
     filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_class = CreatedRangeFilter
     search_fields = ['fullname', 'phone_number', 'university__name']
 
     def create(self, request, *args, **kwargs):

@@ -33,12 +33,22 @@ class StudentSerializer(serializers.ModelSerializer):
     contract = serializers.IntegerField(min_value=0)
     phone_number = serializers.CharField(max_length=13, validators=[validate_phone_number])
     paid_money = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = Student
         fields = [
             "pk", "fullname", "phone_number", "university", "student_type", "contract", "paid_money", "created_at"
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.university:
+            representation['university'] = {
+                'id': instance.university.id,
+                'name': instance.university.name
+            }
+        return representation
 
     @staticmethod
     def get_paid_money(student):
@@ -61,6 +71,15 @@ class StudentDetailUpdateSerializer(serializers.ModelSerializer):
             "pk", "fullname", "phone_number", "university", "student_type", "contract",
             "paid_money", "sponsorships", "created_at"
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.university:
+            representation['university'] = {
+                'id': instance.university.id,
+                'name': instance.university.name
+            }
+        return representation
 
     @staticmethod
     def get_sponsorships(student):
