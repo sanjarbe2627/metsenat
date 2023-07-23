@@ -98,19 +98,34 @@ class SponsorshipSponsorSerializer(serializers.ModelSerializer):
 
 
 class SponsorshipSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+
     class Meta:
         model = Sponsorship
         fields = "__all__"
 
-    def get_sponsor(self, sponsor):
-        serializer = SponsorshipSponsorSerializer(sponsor, many=False)
-        return serializer.data
-
-    def get_student(self, student):
-        serializer = SponsorStudentSerializer(student, many=False)
-        return serializer.data
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['sponsor'] = SponsorshipSponsorSerializer(instance.sponsor, many=False).data
+        representation['student'] = SponsorStudentSerializer(instance.student, many=False).data
+        return representation
 
     def validate_money(self, money):
         request = self.context['request']
-        print("see", self.initial_data.get('sponsor'))
+        sponsor = Sponsor.objects.get(pk=self.initial_data.get('sponsor'))
+        student = Student.objects.get(pk=self.initial_data.get('student'))
+
+        spent_money = sponsor.sponsorship.aggregate(money_sum=Coalesce(Sum('money'), 0))['money_sum']
+        paid_money = student.sponsorship.aggregate(money_sum=Coalesce(Sum('money'), 0))['money_sum']
+
+        if request.method != 'POST':
+            spent_money -= self.instance.money
+            paid_money -= self.instance.money
+
+        if (sponsor.money - spent_money) < money:
+            raise ValidationError(_("Sponsor's account does not have this amount of money. The rest of the money"))
+        else:
+            if (student.contract - paid_money) < money:
+                raise ValidationError(_("Sponsorship money exceeded the contract amount!"))
+
         return money

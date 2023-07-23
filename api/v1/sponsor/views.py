@@ -89,12 +89,12 @@ class SponsorshipDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            instance = self.queryset.filter(pk=kwargs['pk'])
+            instance = self.queryset.get(pk=kwargs['pk'])
             serializer = self.get_serializer(
                 data=request.data, instance=instance, context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            self.perform_update(serializers)
+            self.perform_update(serializer)
 
             return Response({'result': serializer.data}, status=status.HTTP_200_OK)
         except Sponsorship.DoesNotExist:

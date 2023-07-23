@@ -84,3 +84,4 @@ class Sponsorship(models.Model):
     class Meta:
         verbose_name_plural = _("Sponsorships")
         ordering = ['-created_at']
+        unique_together = ('sponsor', 'student')

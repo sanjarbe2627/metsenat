@@ -11,9 +11,7 @@ urlpatterns = [
     path('delete/<int:pk>/', views.SponsorDetailUpdateDeleteView.as_view(), name='sponsor-delete'),
 
     # for sponsorship model
-    path('sponsorship/list/', views.SponsorshipListCreateView.as_view(), name='sponsorship-list'),
-    path('sponsorship/create/', views.SponsorshipListCreateView.as_view(), name='sponsorship-create'),
-    path('sponsorship/detail/<int:pk>/', views.SponsorDetailUpdateDeleteView.as_view(), name='sponsorship-detail'),
-    path('sponsorship/update/<int:pk>/', views.SponsorDetailUpdateDeleteView.as_view(), name='sponsorship-update'),
-    path('sponsorship/delete/<int:pk>/', views.SponsorDetailUpdateDeleteView.as_view(), name='sponsorship-delete'),
+    path('sponsorship/', views.SponsorshipListCreateView.as_view(), name='sponsorship-list-create'),
+    path('sponsorship/<int:pk>/', views.SponsorshipDetailUpdateDeleteView.as_view(),
+         name='sponsorship-detail-update-delete'),
 ]
